@@ -1,3 +1,3 @@
-## pets-client
+## Pets App
 
-More to come!
+Pets! With toys!
