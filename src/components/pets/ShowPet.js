@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { getOnePet, updatePet, removePet } from '../../api/pets'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { Spinner, Container, Card, Button } from 'react-bootstrap'
 import {showPetSuccess, showPetFailure} from '../shared/AutoDismissAlert/messages'
 import EditPetModal from './EditPetModal'
@@ -12,6 +12,7 @@ const ShowPet = (props) => {
     const [updated, setUpdated] = useState(false)
     const {user, msgAlert} = props
     const { id } = useParams()
+    const navigate = useNavigate()
     console.log('id in showPet', id)
     // empty dependency array in useEffect to act like component did mount
     useEffect(() => {
@@ -32,6 +33,25 @@ const ShowPet = (props) => {
                 })
             })
     }, [updated])
+
+    const removeThePet = () => {
+        removePet(user, pet.id)
+            .then(() => {
+                msgAlert({
+                    heading: 'pet politely removed!',
+                    message: 'theyre gone',
+                    variant: 'success',
+                })
+            })
+            .then(() => {navigate(`/`)})
+            .catch(() => {
+                msgAlert({
+                    heading: 'something went wrong',
+                    message: 'that aint it',
+                    variant: 'danger',
+                })
+            })
+    }
 
     if (!pet) {
         return (
@@ -61,7 +81,7 @@ const ShowPet = (props) => {
                         <Button onClick={() => setModalOpen(true)} className="m-2" variant="warning">
                             Edit Pet
                         </Button>
-                        <Button className="m-2" variant="danger">
+                        <Button onClick={() => removeThePet()}className="m-2" variant="danger">
                             Delete Pet
                         </Button>
 
