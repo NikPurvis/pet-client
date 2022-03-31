@@ -2,20 +2,33 @@ import React, {useState, useEffect} from 'react'
 import { getOnePet } from '../../api/pets'
 import { useParams } from 'react-router-dom'
 import { Spinner, Container, Card } from 'react-bootstrap'
+import {showPetSuccess, showPetFailure} from '../shared/AutoDismissAlert/messages'
 
 const ShowPet = (props) => {
 
     const [pet, setPet] = useState(null)
-    console.log('props in showPet', props)
+    const {user, msgAlert} = props
     const { id } = useParams()
     console.log('id in showPet', id)
-
     // Now we need to get a pet
     // An empty dependancy array is necessary to act like componentDidMount and/or componentUpdate, keeps function from infinity loop. (Getting an infinite loop? Check dependancy array!)
     useEffect(() => {
         getOnePet(id)
             .then(res => setPet(res.data.pet))
-            .catch(console.error)
+            .then(() => {
+                msgAlert({
+                    heading: 'Here is the pet!',
+                    message: showPetSuccess,
+                    variant: 'success',
+                })
+            })
+            .catch(() => {
+                msgAlert({
+                    heading: 'No pet found',
+                    message: showPetFailure,
+                    variant: 'danger',
+                })
+            })
     }, [id])
 
     if (!pet) {
