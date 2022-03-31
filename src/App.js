@@ -12,15 +12,16 @@ import SignUp from './components/auth/SignUp'
 import SignIn from './components/auth/SignIn'
 import SignOut from './components/auth/SignOut'
 import ChangePassword from './components/auth/ChangePassword'
-import ShowPet from "./components/pets/ShowPet"
+import ShowPet from './components/pets/ShowPet'
+import CreatePet from './components/pets/CreatePet'
 
 const App = () => {
 
 	const [user, setUser] = useState(null)
-	const [msgAlerts, setMsgAlerts] = useState([])
+  	const [msgAlerts, setMsgAlerts] = useState([])
 
-	console.log('user in app', user)
-	console.log('message alerts', msgAlerts)
+  	console.log('user in app', user)
+  	console.log('message alerts', msgAlerts)
 	const clearUser = () => {
 		console.log('clear user ran')
 		setUser(null)
@@ -57,9 +58,9 @@ const App = () => {
 				<Route
 					path='/sign-out'
 					element={
-						<RequireAuth user={user}>
-							<SignOut msgAlert={msgAlert} clearUser={clearUser} user={user} />
-						</RequireAuth>
+					<RequireAuth user={user}>
+						<SignOut msgAlert={msgAlert} clearUser={clearUser} user={user} />
+					</RequireAuth>
 					}
 				/>
 				<Route
@@ -70,11 +71,18 @@ const App = () => {
 					</RequireAuth>}
 				/>
 				<Route
+					path='/addPet'
+					element={
+						<RequireAuth user={user}>	
+							<CreatePet msgAlert={msgAlert} user={user} />
+						</RequireAuth>
+					}
+				/>
+				<Route
 					path='/pets/:id'
 					element={<ShowPet msgAlert={msgAlert} user={user} />}
 				/>
 			</Routes>
-			
 			{msgAlerts.map((msgAlert) => (
 				<AutoDismissAlert
 					key={msgAlert.id}
