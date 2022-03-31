@@ -4,6 +4,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Spinner, Container, Card, Button } from 'react-bootstrap'
 import {showPetSuccess, showPetFailure} from '../shared/AutoDismissAlert/messages'
 import EditPetModal from './EditPetModal'
+import ShowToy from '../toys/ShowToy'
+
+const cardContainerLayout = {
+    display: 'flex',
+    justifyContent: 'center',
+    flexFlow: 'row wrap'
+}
 
 const ShowPet = (props) => {
 
@@ -53,6 +60,15 @@ const ShowPet = (props) => {
             })
     }
 
+    let toyCards
+    if (pet) {
+        if (pet.toys.length > 0) {
+            toyCards = pet.toys.map(toy => (
+                <ShowToy key={toy.id} toy={toy}/>
+            ))
+        }
+    }
+
     if (!pet) {
         return (
             <Container fluid className="justify-content-center">
@@ -87,6 +103,9 @@ const ShowPet = (props) => {
 
                     </Card.Footer>
                 </Card>
+            </Container>
+            <Container style={cardContainerLayout}>
+                {toyCards}
             </Container>
             <EditPetModal 
                 pet={pet}

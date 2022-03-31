@@ -1,61 +1,93 @@
-import React, {useState, useEffect} from 'react'
-import { getOnePet } from '../../api/pets'
-import { useParams } from 'react-router-dom'
-import { Spinner, Container, Card } from 'react-bootstrap'
-import {showPetSuccess, showPetFailure} from '../shared/AutoDismissAlert/messages'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-const ShowPet = (props) => {
+import { signIn } from '../../api/auth'
+import messages from '../shared/AutoDismissAlert/messages'
 
-    const [pet, setPet] = useState(null)
-    const {user, msgAlert} = props
-    const { id } = useParams()
-    console.log('id in showPet', id)
-    // empty dependency array in useEffect to act like component did mount
-    useEffect(() => {
-        getOnePet(id)
-            .then(res => setPet(res.data.pet))
-            .then(() => {
-                msgAlert({
-                    heading: 'Here is the pet!',
-                    message: showPetSuccess,
-                    variant: 'success',
-                })
-            })
-            .catch(() => {
-                msgAlert({
-                    heading: 'No pet found',
-                    message: showPetFailure,
-                    variant: 'danger',
-                })
-            })
-    }, [id])
+import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
 
-    if (!pet) {
-        return (
-            <Container fluid className="justify-content-center">
-                <Spinner animation="border" role="status" variant="warning" >
-                    <span className="visually-hidden">Loading....</span>
-                </Spinner>
-            </Container>
-        )
-    }
+const SignIn = (props) => {
+	// constructor(props) {
+	// 	super(props)
+
+	// 	this.state = {
+	// 		email: '',
+	// 		password: '',
+	// 	}
+	// }
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    const navigate = useNavigate()
+
+	// handleChange = (event) =>
+	// 	this.setState({
+	// 		[event.target.name]: event.target.value,
+	// 	})
+
+	const onSignIn = (event) => {
+		event.preventDefault()
+        console.log('the props', props)
+		const { msgAlert, setUser } = props
+
+        const credentials = {email, password}
+
+		signIn(credentials)
+			.then((res) => setUser(res.data.user))
+			.then(() =>
+				msgAlert({
+					heading: 'Sign In Success',
+					message: messages.signInSuccess,
+					variant: 'success',
+				})
+			)
+			.then(() => navigate('/'))
+			.catch((error) => {
+                setEmail('')
+                setPassword('')
+				msgAlert({
+					heading: 'Sign In Failed with error: ' + error.message,
+					message: messages.signInFailure,
+					variant: 'danger',
+				})
+			})
+	}
 
     return (
-        <Container className="fluid">
-            <Card>
-                <Card.Header>{pet.fullTitle}</Card.Header>
-                <Card.Body>
-                    <Card.Text>
-                        <small>Age: {pet.age}</small><br/>
-                        <small>Type: {pet.type}</small><br/>
-                        <small>
-                            Adoptable: {pet.adoptable ? 'yes' : 'no'}
-                        </small>
-                    </Card.Text>
-                </Card.Body>
-            </Card>
-        </Container>
+        <div className='row'>
+            <div className='col-sm-10 col-md-8 mx-auto mt-5'>
+                <h3>Sign In</h3>
+                <Form onSubmit={onSignIn}>
+                    <Form.Group controlId='email'>
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control
+                            required
+                            type='email'
+                            name='email'
+                            value={email}
+                            placeholder='Enter email'
+                            onChange={e => setEmail(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Form.Group controlId='password'>
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control
+                            required
+                            name='password'
+                            value={password}
+                            type='password'
+                            placeholder='Password'
+                            onChange={e => setPassword(e.target.value)}
+                        />
+                    </Form.Group>
+                    <Button variant='primary' type='submit'>
+                        Submit
+                    </Button>
+                </Form>
+            </div>
+        </div>
     )
 }
 
-export default ShowPet
+export default SignIn
